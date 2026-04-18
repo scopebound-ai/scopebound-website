@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scopebound — Zero-trust enforcement for AI agents</title>
+<meta name="description" content="Scopebound enforces what your AI agents can do, sees everything they did, and stops them when they go wrong. Framework-native enforcement for LangChain, AutoGen, CrewAI, and more.">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #1A1A2E;
+    --navy2:   #16213E;
+    --teal:    #0F6E56;
+    --tealL:   #1D9E75;
+    --tealXL:  #E1F5EE;
+    --body:    #CBD5E1;
+    --muted:   #94A3B8;
+    --white:   #FFFFFF;
+    --card:    #1E2A3B;
+    --border:  #2D3F55;
+    --code-bg: #0D1B2A;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--navy);
+    color: var(--body);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+
+  a { color: var(--tealL); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(26,26,46,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .nav-logo {
+    font-size: 18px; font-weight: 700; color: var(--white);
+    letter-spacing: -0.3px;
+  }
+  .nav-logo span { color: var(--tealL); }
+  nav ul { list-style: none; display: flex; gap: 2rem; }
+  nav ul a { color: var(--muted); font-size: 14px; }
+  nav ul a:hover { color: var(--white); text-decoration: none; }
+  .nav-cta {
+    background: var(--teal); color: var(--white) !important;
+    padding: 8px 18px; border-radius: 6px; font-size: 14px; font-weight: 500;
+  }
+  .nav-cta:hover { background: var(--tealL); text-decoration: none !important; }
+
+  /* SECTIONS */
+  section { padding: 96px 2rem; max-width: 1100px; margin: 0 auto; }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 120px 2rem 96px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(15,110,86,0.15);
+    border: 1px solid rgba(29,158,117,0.3);
+    color: var(--tealL);
+    font-size: 13px; font-weight: 500;
+    padding: 5px 14px; border-radius: 100px;
+    margin-bottom: 2rem;
+    letter-spacing: 0.3px;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 em { color: var(--tealL); font-style: normal; }
+  .hero p {
+    font-size: 18px; color: var(--muted);
+    max-width: 580px; margin: 0 auto 2.5rem;
+    line-height: 1.7;
+  }
+  .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--teal); color: var(--white);
+    padding: 13px 28px; border-radius: 8px;
+    font-size: 15px; font-weight: 600;
+    display: inline-block; transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--tealL); text-decoration: none; }
+  .btn-ghost {
+    border: 1px solid var(--border); color: var(--body);
+    padding: 13px 28px; border-radius: 8px;
+    font-size: 15px; font-weight: 500;
+    display: inline-block; transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-ghost:hover { border-color: var(--tealL); color: var(--white); text-decoration: none; }
+
+  /* FRAMEWORK LOGOS */
+  .frameworks {
+    text-align: center;
+    border-top: 1px solid var(--border);
+    padding: 48px 2rem;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .frameworks p { font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1.5rem; }
+  .fw-list { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; align-items: center; }
+  .fw-list span { font-size: 14px; font-weight: 600; color: var(--muted); letter-spacing: -0.2px; }
+
+  /* PROBLEM */
+  .problem-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  @media(max-width: 640px) { .problem-grid { grid-template-columns: 1fr; } }
+  .problem-card {
+    background: rgba(164,42,42,0.08);
+    border: 1px solid rgba(227,75,74,0.2);
+    border-radius: 12px; padding: 1.5rem;
+  }
+  .problem-card .icon { font-size: 20px; margin-bottom: 0.75rem; }
+  .problem-card h3 { font-size: 15px; font-weight: 600; color: #F09595; margin-bottom: 0.5rem; }
+  .problem-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* HOW IT WORKS */
+  .section-label {
+    font-size: 12px; font-weight: 600; color: var(--tealL);
+    letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: clamp(28px, 4vw, 42px); font-weight: 800;
+    color: var(--white); letter-spacing: -1px; line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .section-sub { font-size: 17px; color: var(--muted); max-width: 560px; line-height: 1.7; }
+
+  .how-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  @media(max-width: 768px) { .how-grid { grid-template-columns: 1fr; } }
+  .how-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.75rem;
+  }
+  .how-card .step {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(15,110,86,0.2); border: 1px solid rgba(29,158,117,0.3);
+    color: var(--tealL); font-size: 13px; font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  .how-card h3 { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 0.5rem; }
+  .how-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* BEFORE / AFTER */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  @media(max-width: 640px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { border-radius: 12px; padding: 1.75rem; }
+  .compare-col.before {
+    background: rgba(164,42,42,0.06);
+    border: 1px solid rgba(227,75,74,0.2);
+  }
+  .compare-col.after {
+    background: rgba(15,110,86,0.08);
+    border: 1px solid rgba(29,158,117,0.25);
+  }
+  .compare-col h3 { font-size: 13px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 1.25rem; }
+  .compare-col.before h3 { color: #F09595; }
+  .compare-col.after h3 { color: var(--tealL); }
+  .compare-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+  .compare-col ul li { font-size: 14px; display: flex; gap: 10px; align-items: flex-start; line-height: 1.5; }
+  .compare-col.before ul li { color: var(--muted); }
+  .compare-col.before ul li::before { content: '✕'; color: #E24B4A; flex-shrink: 0; margin-top: 1px; }
+  .compare-col.after ul li { color: var(--body); }
+  .compare-col.after ul li::before { content: '✓'; color: var(--tealL); flex-shrink: 0; margin-top: 1px; }
+
+  /* CODE */
+  .code-section {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2.5rem;
+    margin-top: 3rem;
+  }
+  .code-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .code-tab {
+    padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border); color: var(--muted);
+    background: transparent; transition: all 0.15s;
+  }
+  .code-tab.active { background: var(--teal); border-color: var(--teal); color: var(--white); }
+  .code-pane { display: none; }
+  .code-pane.active { display: block; }
+  pre {
+    background: var(--code-bg); border-radius: 10px;
+    padding: 1.5rem; overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+    font-size: 13px; line-height: 1.7;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .kw  { color: #89DDFF; }
+  .fn  { color: #82AAFF; }
+  .str { color: #C3E88D; }
+  .cm  { color: #546E7A; font-style: italic; }
+  .de  { color: var(--tealL); }
+  .pl  { color: #FFCB6B; }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  @media(max-width: 640px) { .features-grid { grid-template-columns: 1fr; } }
+  .feat {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.75rem;
+    display: flex; gap: 1rem;
+  }
+  .feat-icon {
+    width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+    background: rgba(15,110,86,0.15); border: 1px solid rgba(29,158,117,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .feat h3 { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 0.4rem; }
+  .feat p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+    padding: 96px 2rem;
+    border-top: 1px solid var(--border);
+    max-width: 1100px; margin: 0 auto;
+  }
+  .cta-section h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 800; color: var(--white); letter-spacing: -1px; margin-bottom: 1rem; }
+  .cta-section p { font-size: 17px; color: var(--muted); margin-bottom: 2.5rem; }
+  .cta-email {
+    display: inline-block;
+    background: var(--teal); color: var(--white);
+    padding: 16px 40px; border-radius: 10px;
+    font-size: 17px; font-weight: 600;
+    transition: background 0.15s;
+  }
+  .cta-email:hover { background: var(--tealL); text-decoration: none; }
+  .cta-note { margin-top: 1rem; font-size: 14px; color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+    max-width: 1100px; margin: 0 auto;
+    font-size: 13px; color: var(--muted);
+  }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--white); text-decoration: none; }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--border); max-width: 1100px; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Scope<span>bound</span></div>
+  <ul>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#integration">Integration</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="mailto:contact@scopebound.ai" class="nav-cta">Contact us</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Enforce what your agents can do.<br><em>See everything they did.</em></h1>
+  <p>Scopebound sits inside your agent framework and intercepts every tool call before it executes. OPA policies, scoped JWTs, &lt;5ms enforcement, tamper-evident audit log.</p>
+  <div class="hero-actions">
+    <a href="mailto:contact@scopebound.ai" class="btn-primary">Get in touch</a>
+    <a href="#integration" class="btn-ghost">See the integration</a>
+  </div>
+</div>
+
+<!-- FRAMEWORKS -->
+<div class="frameworks">
+  <p>Works with the frameworks you already use</p>
+  <div class="fw-list">
+    <span>LangChain</span>
+    <span>·</span>
+    <span>OpenAI Assistants</span>
+    <span>·</span>
+    <span>CrewAI</span>
+    <span>·</span>
+    <span>AutoGen</span>
+    <span>·</span>
+    <span>Semantic Kernel</span>
+    <span>·</span>
+    <span>Claude Agent SDK</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="section-label">The problem</div>
+  <h2 class="section-title">Your agents have no enforcement layer</h2>
+  <p class="section-sub">Every major framework ships with zero enforcement between the LLM's decision and the tool's execution. When an agent decides to call a tool, nothing checks whether it's allowed.</p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="icon">🚫</div>
+      <h3>No policy enforcement</h3>
+      <p>When an agent calls a tool, it executes immediately. There's no check that the agent is allowed to call that tool — trust is implicit.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🔍</div>
+      <h3>No audit trail</h3>
+      <p>You have no tamper-evident record of what your agents actually called. If something goes wrong, you find out in the next reconciliation run.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">⚡</div>
+      <h3>No drift detection</h3>
+      <p>If a compromised agent starts behaving anomalously — rapid external calls, unusual patterns — nothing detects or stops it.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🔧</div>
+      <h3>Scattered enforcement logic</h3>
+      <p>Teams add guards inside each tool's implementation. That logic is scattered, inconsistent, and doesn't survive framework migrations.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">How it works</div>
+  <h2 class="section-title">Enforcement inside the execution loop</h2>
+  <p class="section-sub">Scopebound sits between the LLM's decision and the tool's execution — the only point where enforcement is both reliable and sub-millisecond.</p>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="step">1</div>
+      <h3>LLM decides to call a tool</h3>
+      <p>Your agent runs normally. The LLM produces a tool call decision as part of its reasoning loop.</p>
+    </div>
+    <div class="how-card">
+      <div class="step">2</div>
+      <h3>Scopebound intercepts (&lt;5ms)</h3>
+      <p>The @enforce decorator intercepts the call before _run() is invoked. OPA evaluates your Rego policy against the agent's scoped JWT.</p>
+    </div>
+    <div class="how-card">
+      <div class="step">3</div>
+      <h3>Allow or deny — with full audit</h3>
+      <p>Allowed calls execute normally. Denied calls raise ScopeboundDenyError before the tool runs. Every decision is written to the tamper-evident audit log.</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="compare-col before">
+      <h3>Without Scopebound</h3>
+      <ul>
+        <li>Tool calls execute immediately with no policy check</li>
+        <li>No record of what the agent actually called</li>
+        <li>Compromised agents run unchecked until you notice</li>
+        <li>Enforcement logic scattered across every tool</li>
+        <li>Framework migration breaks all your security logic</li>
+      </ul>
+    </div>
+    <div class="compare-col after">
+      <h3>With Scopebound</h3>
+      <ul>
+        <li>Every tool call enforced before execution (&lt;5ms)</li>
+        <li>Append-only audit log with SHA-256 hash chain</li>
+        <li>Behavioral drift auto-revokes anomalous sessions</li>
+        <li>One decorator, consistent enforcement everywhere</li>
+        <li>Same SDK across LangChain, AutoGen, CrewAI, and more</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- INTEGRATION -->
+<section id="integration">
+  <div class="section-label">Integration</div>
+  <h2 class="section-title">Three lines of code</h2>
+  <p class="section-sub">Add enforcement to any existing agent tool. Nothing else in your codebase changes.</p>
+
+  <div class="code-section">
+    <div class="code-tabs">
+      <button class="code-tab active" onclick="showTab('langchain')">LangChain</button>
+      <button class="code-tab" onclick="showTab('autogen')">AutoGen</button>
+      <button class="code-tab" onclick="showTab('crewai')">CrewAI</button>
+      <button class="code-tab" onclick="showTab('sk')">Semantic Kernel</button>
+      <button class="code-tab" onclick="showTab('claude')">Claude Agent SDK</button>
+    </div>
+
+    <div id="tab-langchain" class="code-pane active">
+      <pre><span class="kw">from</span> scopebound <span class="kw">import</span> ScopeboundSDK, enforce
+<span class="kw">from</span> langchain_core.tools <span class="kw">import</span> BaseTool
+
+sb = <span class="fn">ScopeboundSDK</span>()  <span class="cm"># reads SCOPEBOUND_BASE_URL + SCOPEBOUND_API_KEY from env</span>
+
+<span class="de">@enforce</span>(sb, role=<span class="str">"invoice-processor"</span>)  <span class="cm"># ← this is the entire integration</span>
+<span class="kw">class</span> <span class="fn">ReadInvoicesTool</span>(BaseTool):
+    name: str = <span class="str">"read_invoices"</span>
+    description: str = <span class="str">"Read pending invoices from the database"</span>
+
+    <span class="kw">def</span> <span class="fn">_run</span>(self, status: str = <span class="str">"pending"</span>) -> str:
+        <span class="cm"># your existing tool logic — unchanged</span>
+        ...</pre>
+    </div>
+
+    <div id="tab-autogen" class="code-pane">
+      <pre><span class="kw">from</span> scopebound <span class="kw">import</span> ScopeboundSDK
+<span class="kw">from</span> scopebound.adapters.autogen <span class="kw">import</span> enforce_autogen
+
+sb = <span class="fn">ScopeboundSDK</span>()
+
+<span class="de">@enforce_autogen</span>(sb, role=<span class="str">"invoice-processor"</span>)
+<span class="kw">def</span> <span class="fn">read_invoices</span>(limit: int = <span class="pl">10</span>) -> str:
+    <span class="cm"># on deny, returns structured error dict instead of raising</span>
+    ...</pre>
+    </div>
+
+    <div id="tab-crewai" class="code-pane">
+      <pre><span class="kw">from</span> scopebound <span class="kw">import</span> ScopeboundSDK
+<span class="kw">from</span> scopebound.adapters.crewai <span class="kw">import</span> CrewEnforcer
+
+sb = <span class="fn">ScopeboundSDK</span>()
+enforcer = <span class="fn">CrewEnforcer</span>(sb, roles={
+    <span class="str">"researcher"</span>: <span class="str">"read-only-analyst"</span>,
+    <span class="str">"writer"</span>:     <span class="str">"email-sender"</span>,
+})
+
+<span class="de">@enforcer.enforce_tool</span>(agent_name=<span class="str">"researcher"</span>)
+<span class="kw">def</span> <span class="fn">search_web</span>(query: str) -> str:
+    ...</pre>
+    </div>
+
+    <div id="tab-sk" class="code-pane">
+      <pre><span class="kw">from</span> scopebound <span class="kw">import</span> ScopeboundSDK
+<span class="kw">from</span> scopebound.adapters.semantic_kernel <span class="kw">import</span> enforce_sk
+
+sb = <span class="fn">ScopeboundSDK</span>()
+
+<span class="kw">class</span> <span class="fn">InvoicePlugin</span>:
+    <span class="de">@enforce_sk</span>(sb, role=<span class="str">"invoice-processor"</span>)
+    <span class="kw">async def</span> <span class="fn">read_invoices</span>(self, limit: int = <span class="pl">10</span>) -> str:
+        ...  <span class="cm"># sync and async both supported</span></pre>
+    </div>
+
+    <div id="tab-claude" class="code-pane">
+      <pre><span class="kw">from</span> claude_agent_sdk <span class="kw">import</span> ClaudeAgentOptions, query
+<span class="kw">from</span> scopebound <span class="kw">import</span> ScopeboundSDK
+<span class="kw">from</span> scopebound.exceptions <span class="kw">import</span> ScopeboundDenyError
+
+sb = <span class="fn">ScopeboundSDK</span>()
+
+<span class="kw">def</span> <span class="fn">scopebound_hook</span>(tool_name: str, tool_input: dict):
+    <span class="kw">try</span>:
+        sb.<span class="fn">enforce</span>(role_id=<span class="str">"invoice-processor"</span>, tool_name=tool_name)
+    <span class="kw">except</span> ScopeboundDenyError <span class="kw">as</span> e:
+        <span class="kw">raise</span> <span class="fn">PermissionError</span>(<span class="fn">f</span><span class="str">"[{e.deny_code}] {e.reason}"</span>)
+
+options = <span class="fn">ClaudeAgentOptions</span>(hooks={<span class="str">"PreToolUse"</span>: scopebound_hook})
+<span class="kw">async for</span> message <span class="kw">in</span> <span class="fn">query</span>(<span class="str">"Process pending invoices"</span>, options=options):
+    <span class="fn">print</span>(message)</pre>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything you need to secure agents in production</h2>
+  <div class="features-grid">
+    <div class="feat">
+      <div class="feat-icon">⚡</div>
+      <div>
+        <h3>Sub-5ms enforcement</h3>
+        <p>OPA/Rego evaluation on the enforce path adds under 5ms. p99 under 10ms in production load.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔑</div>
+      <div>
+        <h3>Cryptographic agent identity</h3>
+        <p>Every agent session gets a scoped JWT. Role, allowed tools, delegation depth, and TTL baked into the token.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📋</div>
+      <div>
+        <h3>Tamper-evident audit trail</h3>
+        <p>Append-only JSONL log with SHA-256 hash chain. Every allow and deny recorded. Chain violation halts the server.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📊</div>
+      <div>
+        <h3>Behavioral drift detection</h3>
+        <p>Statistical baseline + Isolation Forest. Anomaly score above threshold triggers automatic session revocation.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📝</div>
+      <div>
+        <h3>Policy as code</h3>
+        <p>OPA/Rego policies version-controlled alongside your agent code. Hot-reloads without restart.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔌</div>
+      <div>
+        <h3>Framework-native</h3>
+        <p>Adapters for LangChain, OpenAI Assistants, CrewAI, AutoGen, Semantic Kernel, and Claude Agent SDK.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Ready to enforce what your agents can do?</h2>
+  <a href="mailto:contact@scopebound.ai" class="cta-email">contact@scopebound.ai</a>
+  <p class="cta-note">Or <a href="https://pypi.org/project/scopebound/">pip install scopebound</a> and explore the SDK.</p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>© 2026 Scopebound · Zero-trust enforcement for AI agents</div>
+  <div style="display:flex; gap: 1.5rem;">
+    <a href="mailto:contact@scopebound.ai">contact@scopebound.ai</a>
+    <a href="https://pypi.org/project/scopebound/">PyPI</a>
+    <a href="https://github.com/scopebound-ai/scopebound-demo">GitHub</a>
+  </div>
+</footer>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.code-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
