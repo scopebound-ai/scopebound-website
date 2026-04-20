@@ -38,26 +38,38 @@
   /* NAV */
   nav {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(26,26,46,0.92);
+    background: rgba(26,26,46,0.95);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
+    padding: 0 1.5rem;
     display: flex; align-items: center; justify-content: space-between;
     height: 60px;
   }
   .nav-logo {
     font-size: 18px; font-weight: 700; color: var(--white);
-    letter-spacing: -0.3px;
+    letter-spacing: -0.3px; flex-shrink: 0;
   }
   .nav-logo span { color: var(--tealL); }
-  nav ul { list-style: none; display: flex; gap: 2rem; }
-  nav ul a { color: var(--muted); font-size: 14px; }
-  nav ul a:hover { color: var(--white); text-decoration: none; }
+  .nav-links { list-style: none; display: flex; gap: 2rem; align-items: center; }
+  .nav-links a { color: var(--muted); font-size: 14px; }
+  .nav-links a:hover { color: var(--white); text-decoration: none; }
   .nav-cta {
     background: var(--teal); color: var(--white) !important;
     padding: 8px 18px; border-radius: 6px; font-size: 14px; font-weight: 500;
   }
   .nav-cta:hover { background: var(--tealL); text-decoration: none !important; }
+  .nav-mobile-cta {
+    display: none;
+    background: var(--teal); color: var(--white) !important;
+    padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;
+    white-space: nowrap;
+  }
+  .nav-mobile-cta:hover { background: var(--tealL); text-decoration: none !important; }
+  @media(max-width: 700px) {
+    .nav-links { display: none; }
+    .nav-mobile-cta { display: inline-block; }
+    .nav-logo { font-size: 16px; }
+  }
 
   /* SECTIONS */
   section { padding: 96px 2rem; max-width: 1100px; margin: 0 auto; }
@@ -280,18 +292,19 @@
 <!-- NAV -->
 <nav>
   <div class="nav-logo">Scope<span>bound</span></div>
-  <ul>
+  <ul class="nav-links">
     <li><a href="#how">How it works</a></li>
     <li><a href="#integration">Integration</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="mailto:contact@scopebound.ai" class="nav-cta">Contact us</a></li>
   </ul>
+  <a href="mailto:contact@scopebound.ai" class="nav-mobile-cta">Contact us</a>
 </nav>
 
 <!-- HERO -->
 <div class="hero">
   <h1>Enforce what your agents can do.<br><em>See everything they did.</em></h1>
-  <p>Scopebound sits inside your agent framework and intercepts every tool call before it executes. OPA policies, scoped JWTs, &lt;5ms enforcement, tamper-evident audit log.</p>
+  <p>Scopebound sits inside your agent framework and intercepts every tool call before it executes. Define what each agent is allowed to do. Block everything else. See every decision.</p>
   <div class="hero-actions">
     <a href="mailto:contact@scopebound.ai" class="btn-primary">Get in touch</a>
     <a href="#integration" class="btn-ghost">See the integration</a>
@@ -363,7 +376,7 @@
     <div class="how-card">
       <div class="step">2</div>
       <h3>Scopebound intercepts (&lt;5ms)</h3>
-      <p>The @enforce decorator intercepts the call before _run() is invoked. OPA evaluates your Rego policy against the agent's scoped JWT.</p>
+      <p>The @enforce decorator intercepts the call before it executes. Your policy is checked — allowed calls proceed, denied calls are blocked instantly.</p>
     </div>
     <div class="how-card">
       <div class="step">3</div>
@@ -499,7 +512,7 @@ options = <span class="fn">ClaudeAgentOptions</span>(hooks={<span class="str">"P
       <div class="feat-icon">⚡</div>
       <div>
         <h3>Sub-5ms enforcement</h3>
-        <p>OPA/Rego evaluation on the enforce path adds under 5ms. p99 under 10ms in production load.</p>
+        <p>Policy evaluation adds under 5ms per tool call. p99 under 10ms in production load. Your agent barely notices.</p>
       </div>
     </div>
     <div class="feat">
@@ -527,7 +540,7 @@ options = <span class="fn">ClaudeAgentOptions</span>(hooks={<span class="str">"P
       <div class="feat-icon">📝</div>
       <div>
         <h3>Policy as code</h3>
-        <p>OPA/Rego policies version-controlled alongside your agent code. Hot-reloads without restart.</p>
+        <p>Define what each agent role can and cannot do in a simple config file. Version-controlled, hot-reloads without restart.</p>
       </div>
     </div>
     <div class="feat">
@@ -555,7 +568,7 @@ options = <span class="fn">ClaudeAgentOptions</span>(hooks={<span class="str">"P
   <div style="display:flex; gap: 1.5rem;">
     <a href="mailto:contact@scopebound.ai">contact@scopebound.ai</a>
     <a href="https://pypi.org/project/scopebound/">PyPI</a>
-    <a href="https://github.com/scopebound-ai">GitHub</a>
+    <a href="https://github.com/scopebound-ai/scopebound-demo">GitHub</a>
   </div>
 </footer>
 
