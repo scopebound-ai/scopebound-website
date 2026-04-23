@@ -234,6 +234,7 @@
 
   /* FEATURES */
   .features-grid {
+  grid-template-columns: repeat(3, 1fr);
     display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;
     margin-top: 3rem;
   }
@@ -243,6 +244,7 @@
     border-radius: 12px; padding: 1.75rem;
     display: flex; gap: 1rem;
   }
+  .feat code { background: rgba(15,110,86,0.12); color: var(--teal); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
   .feat-icon {
     width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
     background: rgba(15,110,86,0.15); border: 1px solid rgba(29,158,117,0.25);
@@ -326,6 +328,8 @@
     <span>Semantic Kernel</span>
     <span>·</span>
     <span>Claude Agent SDK</span>
+    <span>·</span>
+    <span>MCP</span>
   </div>
 </div>
 
@@ -519,14 +523,14 @@ options = <span class="fn">ClaudeAgentOptions</span>(hooks={<span class="str">"P
       <div class="feat-icon">🔑</div>
       <div>
         <h3>Cryptographic agent identity</h3>
-        <p>Every agent session gets a scoped JWT. Role, allowed tools, delegation depth, and TTL baked into the token.</p>
+        <p>Every agent session gets a scoped JWT. Role, allowed tools, delegation depth, TTL, and rate limits baked into the token.</p>
       </div>
     </div>
     <div class="feat">
       <div class="feat-icon">📋</div>
       <div>
         <h3>Tamper-evident audit trail</h3>
-        <p>Append-only JSONL log with SHA-256 hash chain. Every allow and deny recorded. Chain violation halts the server.</p>
+        <p>Append-only log with SHA-256 hash chain. Every allow and deny recorded with MCP-specific event types. Chain violation halts the server.</p>
       </div>
     </div>
     <div class="feat">
@@ -540,14 +544,42 @@ options = <span class="fn">ClaudeAgentOptions</span>(hooks={<span class="str">"P
       <div class="feat-icon">📝</div>
       <div>
         <h3>Policy as code</h3>
-        <p>Define what each agent role can and cannot do in a simple config file. Version-controlled, hot-reloads without restart.</p>
+        <p>Define what each agent role can and cannot do in OPA/Rego. Version-controlled, signed bundles, hot-reloads without restart.</p>
       </div>
     </div>
     <div class="feat">
       <div class="feat-icon">🔌</div>
       <div>
-        <h3>Framework-native</h3>
-        <p>Adapters for LangChain, OpenAI Assistants, CrewAI, AutoGen, Semantic Kernel, and Claude Agent SDK.</p>
+        <h3>Framework-native + MCP</h3>
+        <p>Adapters for LangChain, OpenAI Assistants, CrewAI, AutoGen, Semantic Kernel, Claude Agent SDK, and MCP servers.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🚦</div>
+      <div>
+        <h3>Per-role rate limiting</h3>
+        <p>Token bucket rate limits per session — per minute and per hour. Exceeded calls denied before execution. Limits baked into the JWT.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔔</div>
+      <div>
+        <h3>Real-time deny webhooks</h3>
+        <p>HMAC-signed webhook fires on every deny event. SCOPE_VIOLATION, RATE_LIMIT_EXCEEDED, BEHAVIORAL_DRIFT — your ops team knows instantly.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📈</div>
+      <div>
+        <h3>Analytics & partner dashboard</h3>
+        <p>Postgres-backed analytics — total calls, allow/deny rates, top denied tools, MCP vs framework split, calls by hour. Live dashboard included.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔒</div>
+      <div>
+        <h3>Dedicated HTTPS enforcement plane</h3>
+        <p>Each partner gets a dedicated instance at <code>partner.api.scopebound.ai</code> with TLS, isolated Postgres schema, and automatic cert renewal.</p>
       </div>
     </div>
   </div>
