@@ -124,6 +124,32 @@
   .cta-email:hover { background: var(--teal); text-decoration: none; }
   .cta-note { font-size: 14px; color: var(--muted); }
 
+  /* MCP SECTION */
+  .mcp-hero { background: linear-gradient(135deg, rgba(15,110,86,0.12) 0%, rgba(26,26,46,0) 60%); border: 1px solid rgba(29,158,117,0.25); border-radius: 16px; padding: 3rem; margin-top: 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+  @media(max-width: 768px) { .mcp-hero { grid-template-columns: 1fr; padding: 2rem; } }
+  .mcp-hero-text h3 { font-size: clamp(20px, 3vw, 28px); font-weight: 700; color: var(--white); letter-spacing: -0.5px; margin-bottom: 1rem; line-height: 1.25; }
+  .mcp-hero-text p { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; }
+  .mcp-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(29,158,117,0.12); border: 1px solid rgba(29,158,117,0.3); color: var(--tealL); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; padding: 4px 12px; border-radius: 99px; margin-bottom: 1.25rem; text-transform: uppercase; }
+  .mcp-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width: 480px) { .mcp-cards { grid-template-columns: 1fr; } }
+  .mcp-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; transition: border-color 0.2s; }
+  .mcp-card:hover { border-color: rgba(29,158,117,0.4); }
+  .mcp-card-icon { font-size: 20px; margin-bottom: 0.6rem; }
+  .mcp-card h4 { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 0.3rem; }
+  .mcp-card p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+  .mcp-threat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 2.5rem; }
+  .mcp-threat { background: rgba(227,75,74,0.05); border: 1px solid rgba(227,75,74,0.18); border-radius: 10px; padding: 1.25rem; }
+  .mcp-threat h4 { font-size: 13px; font-weight: 600; color: #F87171; margin-bottom: 0.4rem; }
+  .mcp-threat p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+  .mcp-how { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2.5rem; }
+  .mcp-how-step { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; text-align: center; }
+  .mcp-how-step .step-num { margin: 0 auto 0.75rem; }
+  .mcp-how-step h4 { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 0.4rem; }
+  .mcp-how-step p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+  .mcp-endpoint { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 2rem; margin-top: 2.5rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .mcp-endpoint code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 14px; color: var(--tealL); }
+  .mcp-endpoint p { font-size: 14px; color: var(--muted); margin: 0; }
+
   footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 13px; color: var(--muted); max-width: 1100px; margin: 0 auto; }
   footer a { color: var(--muted); }
   footer a:hover { color: var(--white); text-decoration: none; }
@@ -136,6 +162,7 @@
   <ul class="nav-links">
     <li><a href="#how">How it works</a></li>
     <li><a href="#integration">Integration</a></li>
+    <li><a href="#mcp">MCP</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="https://docs.scopebound.ai" target="_blank">Docs</a></li>
     <li><a href="https://calendly.com/nilesh-scopebound/30min" class="nav-cta" target="_blank">Book a call</a></li>
@@ -238,6 +265,7 @@
       <button class="code-tab" onclick="showTab('crewai')">CrewAI</button>
       <button class="code-tab" onclick="showTab('sk')">Semantic Kernel</button>
       <button class="code-tab" onclick="showTab('claude')">Claude Agent SDK</button>
+      <button class="code-tab" onclick="showTab('mcp')">MCP</button>
       <button class="code-tab" onclick="showTab('http')">HTTP API</button>
     </div>
     <div id="tab-langchain" class="code-pane active">
@@ -299,6 +327,27 @@ agent = AnthropicAgent(
     hooks=[ScopeboundHook(sb, role_id=<span class="str">"invoice-processor"</span>)]
 )</pre>
     </div>
+    <div id="tab-mcp" class="code-pane">
+      <pre><span class="kw">from</span> scopebound <span class="kw">import</span> ScopeboundSDK
+
+sb = ScopeboundSDK(base_url=<span class="str">"https://your-partner.api.scopebound.ai"</span>, api_key=<span class="str">"..."</span>)
+
+<span class="cm"># Provision a scoped session for your MCP agent</span>
+session = sb.provision(role_id=<span class="str">"mcp-data-agent"</span>)
+
+<span class="cm"># Before each MCP tool call — dedicated MCP enforce endpoint</span>
+response = requests.post(
+    <span class="str">"https://your-partner.api.scopebound.ai/v1/mcp/enforce"</span>,
+    headers={<span class="str">"X-Scopebound-API-Key"</span>: api_key},
+    json={
+        <span class="str">"jwt"</span>: session.jwt,
+        <span class="str">"tool_name"</span>: <span class="str">"query_database"</span>,
+        <span class="str">"call_args"</span>: {<span class="str">"env"</span>: <span class="str">"production"</span>, <span class="str">"limit"</span>: 500}
+    }
+)
+<span class="cm"># decision: "allow" | "deny" | "pending" (HITL approval)</span>
+decision = response.json()[<span class="str">"decision"</span>]</pre>
+    </div>
     <div id="tab-http" class="code-pane">
       <pre><span class="cm"># Proprietary execution layer? ~20 lines, no SDK required</span>
 response = requests.post(
@@ -309,6 +358,97 @@ response = requests.post(
 <span class="kw">if</span> response.json()[<span class="str">"decision"</span>] == <span class="str">"deny"</span>:
     <span class="kw">raise</span> ScopeboundDenyError()  <span class="cm"># tool never executes</span></pre>
     </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- MCP -->
+<section id="mcp">
+  <div class="section-label">MCP Security</div>
+  <h2 class="section-title">The security layer the Model Context Protocol needs</h2>
+  <p class="section-sub">MCP is becoming the standard way agents connect to tools and data sources. It ships with no enforcement. Scopebound is the zero-trust layer that makes MCP production-safe.</p>
+
+  <div class="mcp-hero">
+    <div class="mcp-hero-text">
+      <div class="mcp-badge">🔌 MCP-native</div>
+      <h3>MCP gives agents reach.<br>Scopebound gives you control.</h3>
+      <p>The Model Context Protocol lets agents connect to any tool or data source through a standard interface. That's powerful — and it means a compromised or hallucinating agent now has a standardized path to your databases, APIs, and file systems.</p>
+      <p>Scopebound intercepts every MCP tool call before it executes. The same zero-trust enforcement that protects LangChain and CrewAI agents now protects your MCP servers — with a dedicated endpoint, role-scoped JWT sessions, and a full tamper-evident audit trail.</p>
+      <a href="https://docs.scopebound.ai" target="_blank" class="btn-ghost" style="display:inline-block; margin-top:0.5rem; font-size:14px; padding: 10px 20px;">Read the MCP integration guide →</a>
+    </div>
+    <div class="mcp-cards">
+      <div class="mcp-card">
+        <div class="mcp-card-icon">🛡️</div>
+        <h4>Tool call enforcement</h4>
+        <p>Every MCP tool call hits <code>/v1/mcp/enforce</code> before execution. Scope violations denied in under 5ms.</p>
+      </div>
+      <div class="mcp-card">
+        <div class="mcp-card-icon">🔑</div>
+        <h4>Scoped JWT sessions</h4>
+        <p>Each MCP agent session gets a provisioned JWT. Allowed tools, rate limits, and TTL baked in at session start.</p>
+      </div>
+      <div class="mcp-card">
+        <div class="mcp-card-icon">📋</div>
+        <h4>Tamper-evident audit trail</h4>
+        <p>Every MCP allow and deny recorded in the SHA-256 hash chain audit ledger. SOX-ready out of the box.</p>
+      </div>
+      <div class="mcp-card">
+        <div class="mcp-card-icon">✋</div>
+        <h4>Human-in-the-loop</h4>
+        <p>Flag high-risk MCP tool calls for approval before they execute. Agent pauses, not blocks, while you decide.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:18px; font-weight:700; color:var(--white); margin-top:3rem; margin-bottom:0.5rem;">What MCP agents can do without enforcement</h3>
+  <p style="font-size:15px; color:var(--muted); margin-bottom:0;">MCP's broad connectivity is also its attack surface. Without enforcement, every connected tool is reachable.</p>
+  <div class="mcp-threat-grid">
+    <div class="mcp-threat">
+      <h4>🚫 Prompt injection → tool abuse</h4>
+      <p>Malicious content in a document instructs the agent to call <code>delete_records</code> via MCP. Without enforcement, it runs. With Scopebound, it's denied before execution.</p>
+    </div>
+    <div class="mcp-threat">
+      <h4>🚫 Unbounded data access</h4>
+      <p>An MCP agent queries a database with no row limit. 2 million records returned, ingested, and billed. Scopebound's <code>DATA_LIMIT_EXCEEDED</code> policy blocks it at the call.</p>
+    </div>
+    <div class="mcp-threat">
+      <h4>🚫 Cross-environment writes</h4>
+      <p>A staging agent connects to an MCP server that also serves production. No guardrail stops it writing across environments. Scopebound's ENV_VIOLATION does.</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:18px; font-weight:700; color:var(--white); margin-top:3rem; margin-bottom:0.5rem;">How Scopebound secures an MCP server</h3>
+  <div class="mcp-how">
+    <div class="mcp-how-step">
+      <div class="step-num">01</div>
+      <h4>Provision session</h4>
+      <p>Agent calls <code>/v1/provision</code>. Gets back a scoped JWT with allowed MCP tools baked in.</p>
+    </div>
+    <div class="mcp-how-step highlight" style="background:rgba(15,110,86,0.2); border-color:rgba(29,158,117,0.3);">
+      <div class="step-num">02</div>
+      <h4>Intercept every call</h4>
+      <p>Before each MCP tool executes, POST to <code>/v1/mcp/enforce</code>. Policy evaluated in &lt;5ms.</p>
+    </div>
+    <div class="mcp-how-step">
+      <div class="step-num">03</div>
+      <h4>Allow, deny, or pause</h4>
+      <p>Allow → tool runs. Deny → blocked, webhook fired. Pending → HITL approval requested.</p>
+    </div>
+    <div class="mcp-how-step">
+      <div class="step-num">04</div>
+      <h4>Full audit trail</h4>
+      <p>Every MCP decision in the hash-chained audit ledger. Export CSV for compliance.</p>
+    </div>
+  </div>
+
+  <div class="mcp-endpoint">
+    <div>
+      <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Dedicated MCP endpoint</div>
+      <code>POST /v1/mcp/enforce</code>
+    </div>
+    <p>Drop-in for any MCP server. Same policy engine, same audit trail, same sub-5ms latency. Works alongside all 7 framework adapters.</p>
+    <a href="https://docs.scopebound.ai" target="_blank" class="btn-ghost" style="font-size:13px; padding:8px 16px; white-space:nowrap;">View MCP docs →</a>
   </div>
 </section>
 
@@ -411,8 +551,8 @@ response = requests.post(
     <div class="feat">
       <div class="feat-icon">🔌</div>
       <div>
-        <h3>Framework-native + MCP</h3>
-        <p>Adapters for LangChain, OpenAI Assistants, CrewAI, AutoGen, Semantic Kernel, Claude Agent SDK, and MCP. Proprietary layer? Use the HTTP API — ~20 lines.</p>
+        <h3>MCP + 6 framework adapters</h3>
+        <p>Dedicated <code>/v1/mcp/enforce</code> endpoint for MCP servers. Plus native adapters for LangChain, OpenAI Assistants, CrewAI, AutoGen, Semantic Kernel, and Claude Agent SDK. Proprietary layer? Use the HTTP API — ~20 lines.</p>
       </div>
     </div>
 
